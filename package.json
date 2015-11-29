@@ -20,9 +20,10 @@
         , "ee-types"                : "1.x"
         , "ee-log"                  : "0.3.x"
         , "ee-event-emitter"        : "0.3.x"
+        , "request"                 : "2.x"
     }
     , "devDependencies": {
-          "mocha"                   : "1.17.x"
+          "mocha"                   : "2.x"
     }
     , "optionalDependencies": {}
     , "keywords"                    : ["HTTP", "restful", "API", "tester"]
