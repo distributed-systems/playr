@@ -14,6 +14,7 @@
         inherits: Scenario
 
 
+        , duration: 10
 
 
 
@@ -36,7 +37,7 @@
          * @returns {boolean} 
          */
         , hasRequestAt: function(index) {
-            return index < 10;
+            return index < 90;
         }
 
 
@@ -46,7 +47,7 @@
 
 
 
-        /** 
+        /**
          * returns a request that can be executed
          *
          * @param {number} index the request index
@@ -54,13 +55,16 @@
          * @returns {promise}
          */
         , getRequestAt: function(index, request) {
-            request.url = 'http://127.0.0.1/'+this.id;
-            request.headers.accept = 'application/json';
-            request.method = 'post';
+            request.url = 'http://cornercard.127.0.0.1.xip.io:8000/de/';//+this.id;
+            request.headers.accept = 'application/html';
+            /*request.method = 'post';
             request.query.index = index;
-            request.form.name = 'anna';
+            request.form.name = 'anna';*/
 
-            return Promise.resolve();
+            return new Promise((resolve, reject) => {
+
+                setTimeout(resolve, Math.random()*200);
+            });
         }
 
 
