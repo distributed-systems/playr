@@ -37,7 +37,7 @@
          * @returns {boolean} 
          */
         , hasRequestAt: function(index) {
-            return index < 90;
+            return index < 10;
         }
 
 
@@ -55,11 +55,11 @@
          * @returns {promise}
          */
         , getRequestAt: function(index, request) {
-            request.url = 'http://cornercard.127.0.0.1.xip.io:8000/de/';//+this.id;
-            request.headers.accept = 'application/html';
-            /*request.method = 'post';
+            request.url = 'http://127.0.0.1/'+this.id;
+            request.headers.accept = 'application/json';
+            request.method = 'post';
             request.query.index = index;
-            request.form.name = 'anna';*/
+            request.form.name = 'anna';
 
             return new Promise((resolve, reject) => {
 

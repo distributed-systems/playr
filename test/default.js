@@ -59,27 +59,13 @@
         });
 
 
-        /*it('running a single scenario', function(done) {
+        it('running a single scenario', function(done) {
             let playbook = new Playr();
 
             playbook.run(new TestScenario(1));
 
 
-            playbook.play().then((stats) => { //log(stats);
-                done();
-            }).catch(done);
-        });*/
-
-
-        it('running a single scenario and get stats', function(done) {
-            this.timeout(15000);
-
-            let playbook = new Playr();
-
-            playbook.run(new TestScenario(1));
-
-
-            playbook.play().then((stats) => { log(stats.getLiveAggregateData(10, 1));
+            playbook.play().then((stats) => {
                 done();
             }).catch(done);
         });

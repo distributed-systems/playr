@@ -1,7 +1,7 @@
 {
       "name"                        : "playr"
     , "description"                 : "HTTP API and load tester"
-    , "version"                     : "0.1.0"
+    , "version"                     : "1.0.0"
     , "homepage"                    : "https://github.com/distributed-systems/playr"
     , "author"                      : "Michael van der Weg <michael@joinbox.com> (http://joinbox.com/)"
     , "license"                     : "MIT"
@@ -21,6 +21,8 @@
         , "ee-log"                  : "0.3.x"
         , "ee-event-emitter"        : "0.3.x"
         , "request"                 : "2.x"
+        , "blessed"                 : "0.1.x"
+        , "blessed-contrib"         : "2.x"
     }
     , "devDependencies": {
           "mocha"                   : "2.x"
