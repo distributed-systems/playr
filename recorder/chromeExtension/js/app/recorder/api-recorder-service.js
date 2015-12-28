@@ -1,20 +1,50 @@
+/**
+* Records calls that Chrome makes (through chrome.devtools.network) and parses those calls.
+*/
+/* global jb, chrome */
 ( function() {
 
 	angular
-	.module( 'jb.apiRecorder.recorderService', [ 'jb.apiRecorder.settingsService' ] )
-	.factory( 'APIRecorderService', [ '$rootScope', 'SettingsService', function( $rootScope, SettingsService ) {
+	.module( 'jb.apiRecorder.recorderService', [ 'jb.apiRecorder.settingsService', 'jb.apiBody.parser' ] )
+	.factory( 'APIRecorderService', [ '$rootScope', '$q', 'SettingsService', 'BodyParserService', function( $rootScope, $q, SettingsService, BodyParserService ) {
 		
 
-		var _calls = []
-			,_self; // Needed in handler for onRequestFinished
+			// Contains Calls in the order they were recorded
+		var _calls 		= []
+			, _self
+
+			// Time stamp of the latest call's end
+			, _latestCallEnd;
 
 		var APIRecorder = function() {
-			_self = this; 
+			_self = this;
 		};
 
 
 
+		/**
+		* Exports calls (by invoking APICallExporter)
+		*/
+		APIRecorder.prototype.exportCalls = function() {
 
+			var data = new window.jb.APICallExporter().export( _calls );
+			return data;
+
+		};
+
+
+		/**
+		* Removes the calls (clears recordings)
+		*/
+		APIRecorder.prototype.clearCalls = function() {
+			_calls.splice( 0, _calls.length );
+		};
+
+
+
+		/**
+		* Returns calls
+		*/
 		APIRecorder.prototype.getCalls = function() {
 			return _calls;
 		};
@@ -27,6 +57,7 @@
 		APIRecorder.prototype.record = function() {
 
 			console.log( 'APIRecorder: Record' );
+			// Don't use bind(this), as binding the function to a scope won't allow us to stop recording!
 			chrome.devtools.network.onRequestFinished.addListener( this.requestHandler );
 
 		};
@@ -36,10 +67,14 @@
 		* Handler for calls
 		*/
 		APIRecorder.prototype.requestHandler = function( request ) {
-			console.log( 'APIRecorder: Request %o finished.', request );
+
+			console.log( 'APIRecorder: Request to %o (%o) finished: %o.', request.request.url, request.request.method, request );
 			$rootScope.$apply( function() {
+				//console.group( '%o %o', request.request.method, request.request.url );
 				_self.processRequest( request );
+				//console.groupEnd();
 			} );
+
 		};
 
 
@@ -55,6 +90,9 @@
 
 
 
+		/**
+		* Removes a call from the list of _calls
+		*/
 		APIRecorder.prototype.removeCall = function( call ) {
 
 			var index = _calls.indexOf( call );
@@ -122,10 +160,26 @@
 		};
 
 
+		APIRecorder.prototype.getContent = function( request ) {
+
+			var deferred = $q.defer();
+
+			request.getContent( function( content, encoding ) {
+				deferred.resolve( content );
+			} );
+
+			return deferred.promise;
+
+		};
+
+
+
 
 		APIRecorder.prototype.processRequest = function( req ) {
 
 			var self = this;
+
+			var stop = false;
 
 			// content-type of response belongs to settings.requestHeadersToDiscard:
 			// Don't process response
@@ -133,31 +187,102 @@
 
 				.then( function( process ) {
 
-					if( !process ) {
+					stop = !process;
+					if( stop ) {
+						return false;
+					}
+
+					return self.getContent( req );
+
+				} )
+
+				// Content gotten
+				.then( function( content ) {
+
+					if( stop ) {
 						return false;
 					}
 					
 					var call = new Call( self );
-			
+					
 					var shortUrl = req.request.url.substr( req.request.url.lastIndexOf( '/' ) + 1 );
 
 					call.name = req.request.method.toLowerCase() + '-' + shortUrl;
 
-					var requestHeaders = self.processHeaders( req.request.headers );
+
+					// REQUEST
 					var request 		= new Request();
 					request.url 		= shortUrl;
 					request.completeUrl	= req.request.url;
+					
+					// Headers
+					var requestHeaders	= [];
+					req.request.headers.forEach( function( header ) {
+						var reqHeader = new RequestHeader();
+						reqHeader.name		= header.name;
+						reqHeader.value		= header.value;
+						requestHeaders.push( reqHeader );
+					} );
 					request.headers 	= requestHeaders;
+
 					request.method 		= req.request.method;
+
+					// PauseBefore
+					var pause			= _latestCallEnd ? req.startedDateTime - _latestCallEnd : 0;
+					// Round to 50 ms; not less than 0 ms
+					request.pauseBefore	= Math.max( Math.ceil( pause / 50 ) * 50, 0 );
+
+					if( req.request.postData ) {
+						request.body		= new jb.RequestBodyParser().parse( req.request.postData );
+						console.log( 'ApiRecorder: Parsed postData %o into %o', req.request.postData, request.body );
+					}
+
 					call.request 		= request;
 
-					var response 		= new Response();
-					response.headers 	= self.processHeaders( req.response.headers );
 
-					call.response 		= response;
+
+					// RESPONSE
+					var response 			= new Response();
+					response.headers 		= self.processHeaders( req.response.headers );
+					response.responseTime 	= {
+						comparator			: '<='
+						// Round to 50 ms
+						, value				: Math.ceil( req.time / 50 ) * 50
+					};
+
+					// Only parse JSON
+					var contentType;
+					if( response.headers && response.headers.length ) {
+						response.headers.some( function( item ) {
+
+							if( item.name === 'content-type' || item.name === 'Content-Type' ) {
+								contentType = item.value;
+								return true;
+							}
+
+						} );
+					}
+
+					response.body			= {};
+					// Only try to parse JSON bodies
+					if( contentType && contentType.indexOf( 'application/json' ) === 0 ) {
+						var responseBody	= BodyParserService.parse( content );
+						response.body 		= responseBody;
+					}
+					response.status			= req.response.status;
+
+
+
+					call.response 			= response;
 
 					console.log( 'APIRecorder: Processed call %o', call );
 					_calls.push( call );
+
+
+					// Store latest call's end time. Calls that are not handled (because they're
+					// excepted in settings) don't count to _latestCallEnd
+					_latestCallEnd = req.startedDateTime.getTime() + req.time;
+
 
 	
 				} );
@@ -169,52 +294,22 @@
 
 		APIRecorder.prototype.processHeaders = function( headers ) {
 	
-			var ret = []
-				, self = this;
+			var ret = [];
 
 			headers.forEach( function( header ) {
 
-				var retHeader			= new Header();
+				var retHeader			= new ResponseHeader();
 				retHeader.name 			= header.name;
-				retHeader.value = header.value;
-				retHeader.optional 		= true;
-				retHeader.nullable 		= true;
-				retHeader.type 			= self.recognizeType( header.value );
+				retHeader.value 		= header.value;
+				retHeader.comparator	= '='; // Default comparator for all types
+				retHeader.optional 		= false;
+				retHeader.type 			= new window.jb.StringTypeRecognizer().recognizeType( header.value );
 
 				ret.push( retHeader );
 
 			} );
 
 			return ret;
-
-		};
-
-
-		/**
-		* Tries to recognize type of value passed, returns best guess: 
-		* - date
-		* - number
-		* - string
-		* Very primitive (but quick) implementation.
-		*/
-		APIRecorder.prototype.recognizeType = function( value ) {
-	
-			if( parseInt( value, 10 ) == value ) {
-				return 'number';
-			}
-
-			if( parseFloat( value ) == value ) {
-				return 'number';
-			}
-
-			// Date recognizes numbers as dates – move 
-			// below number
-			var date = new Date( value );
-			if( !isNaN( date.getTime() ) /*&& date.toString() === value*/ ) {
-				return 'date';
-			}
-
-			return 'string';
 
 		};
 
@@ -292,6 +387,20 @@
 			, writable: true
 		} );
 
+		Object.defineProperty( this, 'body', {
+			enumerable: true
+			, writable: true
+		} );
+
+		// Time in ms the playr should wate before making this request. 
+		// Contains an object with properties
+		// - duration
+		// - comparator
+		Object.defineProperty( this, 'pauseBefore', {
+			enumerable: true
+			, writable: true
+		} );
+
 	};
 
 	Request.prototype.removeHeader = function( header ) {
@@ -299,10 +408,11 @@
 	};
 
 	Request.prototype.createHeader = function( name ) {
-		var header = new Header();
+		var header = new RequestHeader();
 		header.name = name;
 		this.headers.push( header );
 	};
+
 
 
 
@@ -319,6 +429,19 @@
 			, writable: true
 		} );
 
+		Object.defineProperty( this, 'status', {
+			enumerable: true
+			, writable: true
+		} );
+
+		// Time the response takes, in ms. Contains an object with properties
+		// - duration
+		// - comparator
+		Object.defineProperty( this, 'responseTime', {
+			enumerable: true
+			, writable: true
+		} );
+
 	};
 
 	Response.prototype.removeHeader = function( header ) {
@@ -326,7 +449,7 @@
 	};
 
 	Response.prototype.createHeader = function( name ) {
-		var header = new Header();
+		var header = new ResponseHeader();
 		header.name = name;
 		this.headers.push( header );
 	};
@@ -337,7 +460,14 @@
 
 
 	// Define header object
-	var Header = function() {
+	var ResponseHeader = function() {
+
+		// Make sure we can tell response headers apart from request headers.
+		// See recorded-call-header directive where both are used.
+		Object.defineProperty( this, 'headerType', {
+			enumerable	: true
+			, value		: 'response'
+		} );
 
 		Object.defineProperty( this, 'name', {
 			enumerable: true
@@ -355,6 +485,33 @@
 		} );
 
 		Object.defineProperty( this, 'nullable', {
+			enumerable: true
+			, writable: true
+		} );
+
+		Object.defineProperty( this, 'value', {
+			enumerable: true
+			, writable: true
+		} );
+
+		Object.defineProperty( this, 'comparator', {
+			enumerable: true
+			, writable: true
+		} );
+
+	};
+
+
+
+	// Simple header for request (has no comparator or type)
+	var RequestHeader = function() {
+
+		Object.defineProperty( this, 'headerType', {
+			enumerable	: true
+			, value		: 'request'
+		} );
+
+		Object.defineProperty( this, 'name', {
 			enumerable: true
 			, writable: true
 		} );

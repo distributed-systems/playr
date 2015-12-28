@@ -1,0 +1,23 @@
+<!-- Type -->
+<div layout="row">
+	<md-input-container>
+		<label>Type</label>
+		<md-select ng-model="recordedCallBodyValue.data.type">
+			<md-option ng-repeat="type in recordedCallBodyValue.types">{{type}}</md-option>
+		</md-select>
+	</md-input-container>
+
+	<!-- Comparator -->
+	<md-input-container>
+		<label>Comparator</label>
+		<md-select ng-model="recordedCallBodyValue.data.comparator">
+			<md-option ng-repeat="type in recordedCallBodyValue.getComparatorsForDataType()">{{ type }}</md-option>
+		</md-select>
+	</md-input-container>
+
+	<!-- Value -->
+	<md-input-container flex>
+		<label>Value</label>
+		<input ng-model="recordedCallBodyValue.data.value"></md-input>
+	</md-input-container>
+</div>

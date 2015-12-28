@@ -1,0 +1,9 @@
+<div layout="row">
+	<div flex="25">Body</div>
+	<div flex="75" layout="column">
+		
+		<!-- top-most data is always an object (not really; but let's assume) -->
+		<div recorded-call-body-object ng-if="recordedCallBody.body.type === 'object'" data="recordedCallBody.body"></div>
+
+	</div>
+</div>

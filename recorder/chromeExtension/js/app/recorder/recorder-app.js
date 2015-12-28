@@ -5,7 +5,7 @@
 	'use strict';
 
 	angular
-	.module( 'jb.apiRecorder', [ 'jb.apiRecorder.recorder', 'jb.apiRecorder.recorderService', 'jb.apiRecorder.settings', 'ngMaterial' ] )
+	.module( 'jb.apiRecorder', [ 'jb.apiRecorder.recorder', 'jb.apiRecorder.recorderService', 'jb.apiRecorder.settings', 'jb.apiBody.component', 'ngMaterial' ] )
 	.directive( 'recorderApp', [ function() {
 
 		return {
@@ -25,8 +25,7 @@
 
 	.controller( 'RecorderAppController', [ 'APIRecorderService', function( APIRecorderService ) {
 
-		var _element
-			, _recording = false
+		var _recording = false
 			, _settingsVisible = false;
 
 
@@ -74,6 +73,29 @@
 		};
 
 
+
+
+		//
+		// EXPORT / CLEAR
+		//
+
+		/**
+		* Returns true if data was recorded and not all calls were deleted
+		*/
+		this.hasData = function() {
+			if( APIRecorderService.getCalls() && APIRecorderService.getCalls().length ) {
+				return true;
+			}
+			return false;
+		};
+
+		this.clearData = function() {
+			APIRecorderService.clearCalls();
+		};
+
+		this.exportData = function() {
+			alert( JSON.stringify( APIRecorderService.exportCalls() ) );
+		};
 
 
 

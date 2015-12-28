@@ -1,0 +1,37 @@
+<div layout="row" flex>
+
+	<!-- Spacer -->
+	<!--<div style="border-right:1px solid #ddd;margin-right:20px;margin-left:20px;"></div>-->
+	
+	<div layout="column" flex>
+
+		<!-- Length/type -->	
+		<div layout="row" layout-align="start center">
+			<md-input-container>
+				<label>length comparator</label>
+				<input ng-model="recordedCallBodyArray.data.length.comparator"/>
+			</md-input-container>
+			<md-input-container>
+				<label>length</label>
+				<input ng-model="recordedCallBodyArray.data.length.value"/>
+			</md-input-container>
+			<div>
+				items of type {{recordedCallBodyArray.data.values.type}}
+			</div>
+		</div>
+
+		<!-- Contents: Object -->
+		<div ng-if="recordedCallBodyArray.data.values.type === 'object'" layout="row">
+			<!-- Spacer -->
+			<div style="border-right:1px solid #ddd;margin-right:20px;margin-left:20px;"></div>
+			<!-- Object -->
+			<div recorded-call-body-object data="recordedCallBodyArray.data.values" flex></div>
+		</div>
+
+		<!-- Contents: Array -->
+		<div ng-if="recordedCallBodyArray.data.values.type === 'array'" layout="row">
+			<!-- Object -->
+			<div recorded-call-body-array data="recordedCallBodyArray.data.values" flex></div>
+		</div>
+
+</div>
