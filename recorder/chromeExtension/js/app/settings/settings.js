@@ -28,7 +28,7 @@
 
 		this.data = {};
 
-		this.init = function(el) {
+		this.init = function() {
 		
 			var self = this;
 

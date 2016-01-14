@@ -3,6 +3,8 @@
 * a settings is changed.
 */
 
+/* global chrome */
+
 ( function() {
 
 	'use strict';
@@ -42,7 +44,7 @@
 
 
 
-		Settings.prototype.getSettings = function( name ) {
+		Settings.prototype.getSettings = function() {
 		
 			var self = this;
 

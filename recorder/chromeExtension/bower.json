@@ -4,8 +4,11 @@
 	, "main"		: "js/devtools.js.js"
 	, "dependencies": {
 		"angular"				: "1.4.x"
-		, "angular-material"	: "0.11.x"
+		, "angular-material"	: "1.0.x"
 		, "font-awesome"		: "4.4.x"
+	}
+	, "devDependencies": {
+		"angular-mocks"			: "1.4.x"
 	}
 	, "ignore"		: [
 	]
