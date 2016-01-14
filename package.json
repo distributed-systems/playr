@@ -1,7 +1,7 @@
 {
       "name"                        : "playr"
     , "description"                 : "HTTP API and load tester"
-    , "version"                     : "1.0.2"
+    , "version"                     : "1.0.3"
     , "homepage"                    : "https://github.com/distributed-systems/playr"
     , "author"                      : "Michael van der Weg <michael@joinbox.com> (http://joinbox.com/)"
     , "license"                     : "MIT"
