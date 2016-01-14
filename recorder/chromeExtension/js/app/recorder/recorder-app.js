@@ -94,7 +94,45 @@
 		};
 
 		this.exportData = function() {
-			alert( JSON.stringify( APIRecorderService.exportCalls() ) );
+
+			var json = JSON.stringify( APIRecorderService.exportCalls(), null, 4 );
+
+			// Inspiration: http://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
+			var textarea = document.createElement( 'textarea' );
+
+			textarea.style.opacity 		= 0;
+			textarea.style.width 		= '1em';
+			textarea.style.height 		= '1em';
+			textarea.style.border 		= 'none';
+			textarea.style.position 	= 'fixed';
+			textarea.style.left 		= 0;
+			textarea.style.top 			= 0;
+
+			textarea.value = json;
+
+			document.documentElement.appendChild( textarea );
+
+			textarea.select();
+
+			var success;
+			try {
+				success = document.execCommand( 'copy' );
+			}
+			catch( err ) {
+			}
+
+			document.documentElement.removeChild( textarea );
+
+			if( success ) {
+				alert( 'JSON copied to clipboard' );
+			}
+			else {
+				alert( 'Could not copy JSON to clipboard.' );
+			}
+
+
+
+
 		};
 
 

@@ -29,9 +29,11 @@
 			, scenario			: []
 		};
 
+		// Go through all calls
 		calls.forEach( function( call ) {
 
 			var parsed = this.parseCall( call );
+
 			// Append parsed to array
 			[].push.apply( ret.scenario, parsed );
 		
@@ -100,6 +102,8 @@
 
 
 
+
+
 		//
 		// SCENARIO.RESPONSE
 		//
@@ -117,7 +121,7 @@
 			};
 		}
 
-		// Headers
+		// Response Headers
 		if( call.response.headers && call.response.headers.length ) {
 
 			var headers = {};
@@ -135,6 +139,13 @@
 
 		}
 
+
+		// Response Body
+		if( call.response.body ) {
+			response.body = this._parseResponseBody( call.response.body );
+		}
+
+
 		scenario.response = response;
 
 
@@ -142,9 +153,18 @@
 		// Add request to ret
 		ret.push( scenario );
 
-		console.error( ret );
+		//console.error( ret );
 
 		return ret;
+
+	};
+
+
+
+	APICallExporter.prototype._parseResponseBody = function( body ) {
+		
+		// Objects that constitute the body all must have an getPlayrJSON method
+		return body.getPlayrJSON();
 
 	};
 

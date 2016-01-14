@@ -10,7 +10,7 @@ not used to compare anything.
 	<div flex="75" layout="column">
 
 		<!-- List headers -->
-		<div ng-repeat="header in recordedCallHeaders.request.headers" layout="row">
+		<div ng-repeat="header in recordedCallHeaders.request.headers" layout="row" class="header-row">
 
 			<!-- Optional -->
 			<div layout-align="center center" layout="row" style="margin-right: 20px;" ng-if="header.headerType === 'response'">

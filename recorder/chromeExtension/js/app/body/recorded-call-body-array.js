@@ -34,24 +34,25 @@
 
 		var _element;
 
-		this.newPropertyKey = undefined;
-		this.createNewProperty = false;
+		this.newDataType = undefined;
+
+		this.types = jb.entities.Entity.types;
 
 		this.init = function( el ) {
 			_element = el;
 		};
 
-		this.removeProperty = function( property ) {
-			alert( 'rm ' + property.key );
+
+		/**
+		* Adds data property to array constraint
+		*/
+		this.setDataType = function() {
+
+			this.data.createDataType( this.newDataType );
+			this.newDataType = undefined;
+
 		};
 
-		this.createProperty = function() {
-			this.data.properties.push ( {
-				key				: this.newPropertyKey
-				, type			: jb.StringTypeRecognizer.types.string
-			} );
-			this.createNewProperty = false;
-		};
 
 	} ] );
 

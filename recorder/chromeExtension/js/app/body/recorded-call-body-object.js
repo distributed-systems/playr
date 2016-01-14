@@ -35,23 +35,24 @@
 
 		var _element;
 
-		this.newPropertyKey = undefined;
-		this.createNewProperty = false;
+		this.isAddingProperty = false;
+		this.propertyTypeToBeAdded = undefined;
+
+		// Make available types public
+		this.types = jb.entities.Entity.types;
+
+		this.startAddingProperty = function() {
+			this.isAddingProperty = true;
+		};
+
+		this.addProperty = function() {
+			this.isAddingProperty = false;
+			this.data.addProperty( this.propertyTypeToBeAdded );
+			this.propertyTypeToBeAdded = undefined; // Or we can't look for change event
+		};
 
 		this.init = function( el ) {
 			_element = el;
-		};
-
-		this.removeProperty = function( property ) {
-			this.data.properties.splice( this.data.properties.indexOf( property ), 1 );
-		};
-
-		this.createProperty = function() {
-			this.data.properties.push ( {
-				key				: this.newPropertyKey
-				, type			: jb.StringTypeRecognizer.types.string
-			} );
-			this.createNewProperty = false;
 		};
 
 	} ] );

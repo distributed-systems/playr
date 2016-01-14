@@ -183,12 +183,81 @@
 
 		it( 'exports a response body correctly', function() {
 
-			var res = exporter.export( [ {
+			var bodies = [
+				/*{
+					input: {
+						type			: 'object'
+						, properties	: [ {
+							key			: 'name'
+							, type		: 'string'
+							, value		: 'test'
+							, comparator: '='
+						} ]
+					}
+					, output: {
+						kind			: 'object'
+						, 
+					}
+				},*/ {
+					input: {
+						type				: 'array'
+						, length			: {
+							comparator		: '='
+							, value			: 3
+						}
+						, values			: {
+							type			: 'string'
+						}
+					}
+					, output: {
+						kind				: 'array'
+						, length			: {
+							kind			: 'comparator'
+							, comparator	: '='
+							, value			: 3
+						}
+						, data				: {
+							kind			: 'type'
+							, type			: 'string'
+						}
+					}
+				}
+
+
+				/*, {
+					input: {
+						type				: 'array'
+						, length			: {
+							comparator		: '='
+							, value			: 3
+						}
+						, values			: {
+							type			: 'string'
+						}
+					}
+					, output: {
+						kind				: 'array'
+						, length			: {
+							kind			: 'comparator'
+							, comparator	: '='
+							, value			: 3
+						}
+						, data				: {
+							kind			: 'type'
+							, type			: 'string'
+						}
+					}
+				}*/
+
+			];
+
+
+			/*var res = exporter.export( [ {
 				request					: {}
 				, response				: {
 					body				: undefined
 				}
-			} ] );
+			} ] );*/
 
 
 		} );

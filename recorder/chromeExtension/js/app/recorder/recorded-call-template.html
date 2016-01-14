@@ -91,10 +91,12 @@
 			<div recorded-call-headers request="recordedCall.callData.response"></div>
 
 			<!-- Body -->
-			<div recorded-call-body request="recordedCall.callData.response"></div>
-
-
-			<!-- Body -->
+			<div layout="row">
+				<div flex="25">Body</div>
+				<div flex="75">
+					<div recorded-call-body data="recordedCall.callData.response.body"></div>
+				</div>
+			</div>
 
 
 		</md-content>

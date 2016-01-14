@@ -22,26 +22,24 @@
 			, scope				: {
 				// Request (instead of headers) must be passed so that we can
 				// remove/add headers
-				request			: '='
+				data			: '='
 			}
 		};
 
 
 	} ] )
 
-	.controller( 'RecordedCallBodyController', [ function() {
+	.controller( 'RecordedCallBodyController', [ 'BodyHelperService', function( BodyHelperService ) {
 
 		var _element;
 
-		console.error( this.request );
-		this.body = this.request.body;
 
 		this.init = function( el ) {
 			_element = el;
 		};
 
 
-
+		this.bodyHelper = BodyHelperService;
 
 	} ] );
 

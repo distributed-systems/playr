@@ -29,20 +29,40 @@
 
 	.controller( 'RecordedCallBodyValueController', [ function() {
 
-		var _element
-			, _stringTypeRecognizer = new jb.StringTypeRecognizer();
+		var _element;
+
+		this.isCreatingConstraint = false;
+		this.availableConstraints = [ {
+				name		: 'Regular Expression'
+				, value 	: 'regex'
+			}, {
+				name		: 'Comparator'
+				, value		: 'comparator'
+			}
+		];
+		this.newConstraintType = this.availableConstraints[ 0 ];
 
 		this.init = function( el ) {
 			_element = el;
 		};
 
-		this.getComparatorsForDataType = function() {
-			var types = _stringTypeRecognizer.getComparatorsForType( this.data.type );
-			return types;
+
+		/**
+		* Start creating a new constraint (user clicked button)
+		*/
+		this.startCreatingConstraint = function() {
+			this.isCreatingConstraint = true;
 		};
 
-		// Make types accessible in frontend
-		this.types = _stringTypeRecognizer.types;
+		/**
+		* Create new constraint (type: this.newConstraintType)
+		*/
+		this.createConstraint = function() {
+			this.data.createConstraint( this.newConstraintType );
+			this.newConstraintType = undefined; // Or change event might not fire
+			this.isCreatingConstraint = false;
+		};
+
 
 
 	} ] );

@@ -5,7 +5,7 @@
 ( function() {
 
 	angular
-	.module( 'jb.apiRecorder.recorderService', [ 'jb.apiRecorder.settingsService', 'jb.apiBody.parser' ] )
+	.module( 'jb.apiRecorder.recorderService', [ 'jb.apiRecorder.settingsService', 'jb.apiBody.parser', 'jb.apiBody.helper' ] )
 	.factory( 'APIRecorderService', [ '$rootScope', '$q', 'SettingsService', 'BodyParserService', function( $rootScope, $q, SettingsService, BodyParserService ) {
 		
 

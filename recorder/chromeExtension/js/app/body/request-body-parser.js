@@ -12,7 +12,12 @@
 
 	RequestBodyParser.prototype.parse = function( requestBody ) {
 
-		if( !requestBody || !requestBody.mimeType ) {
+		if( !requestBody ) {
+			console.log( 'RequestBodyParser: no requestBody passed' );
+			return {};
+		}
+
+		if( !requestBody.mimeType ) {
 			console.error( 'RequestBodyParser: mimeType property missing' );
 			return {};
 		}

@@ -1,37 +1,32 @@
-<div layout="row" flex>
+<div layout="column" flex>
 
-	<!-- Spacer -->
-	<!--<div style="border-right:1px solid #ddd;margin-right:20px;margin-left:20px;"></div>-->
-	
+	<!-- Length -->
+	<div layout="row" flex>
+		<md-input-container style="width: 200px">
+			<label>Length comparator</label>
+			<input ng-model="recordedCallBodyArray.data.getConstraintsByKind('array')[0].length.comparator"/>
+		</md-input-container>
+		<md-input-container flex>
+			<label>Length value</label>
+			<input ng-model="recordedCallBodyArray.data.getConstraintsByKind('array')[0].length.value"/>
+		</md-input-container>
+	</div>
+
+	<!-- Data -->
 	<div layout="column" flex>
-
-		<!-- Length/type -->	
-		<div layout="row" layout-align="start center">
+		<!-- Create data -->
+		<div ng-if="recordedCallBodyArray.data.getConstraintsByKind('array')[0].data.length === 0">
 			<md-input-container>
-				<label>length comparator</label>
-				<input ng-model="recordedCallBodyArray.data.length.comparator"/>
+				<label>Data type of array</label>
+				<md-select ng-model="recordedCallBodyArray.newDataType" ng-change="recordedCallBodyArray.setDataType()">
+					<md-option ng-repeat="type in recordedCallBodyArray.types" value="{{type.identifier}}">{{type.name}}</md-option>
+				</md-select>
 			</md-input-container>
-			<md-input-container>
-				<label>length</label>
-				<input ng-model="recordedCallBodyArray.data.length.value"/>
-			</md-input-container>
-			<div>
-				items of type {{recordedCallBodyArray.data.values.type}}
-			</div>
 		</div>
 
-		<!-- Contents: Object -->
-		<div ng-if="recordedCallBodyArray.data.values.type === 'object'" layout="row">
-			<!-- Spacer -->
-			<div style="border-right:1px solid #ddd;margin-right:20px;margin-left:20px;"></div>
-			<!-- Object -->
-			<div recorded-call-body-object data="recordedCallBodyArray.data.values" flex></div>
-		</div>
+		<!-- Has data -->
+		<div ng-if="recordedCallBodyArray.data.getConstraintsByKind('array')[0].data" recorded-call-body data="recordedCallBodyArray.data.getConstraintsByKind('array')[0].data"></div>
 
-		<!-- Contents: Array -->
-		<div ng-if="recordedCallBodyArray.data.values.type === 'array'" layout="row">
-			<!-- Object -->
-			<div recorded-call-body-array data="recordedCallBodyArray.data.values" flex></div>
-		</div>
+	</div>
 
 </div>
